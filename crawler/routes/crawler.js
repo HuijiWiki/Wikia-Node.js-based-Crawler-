@@ -8,9 +8,28 @@ var async = require('async');
 
 
 
-//need to set up the token receiver and resender of on the test.huiji.wiki side
 
-
+//a function to recursively crawl all the related templates for a specific page
+function getAllArticles(client, params, result, callback){
+  client.api.call(params, function(err, info,next,data){
+    if(err) callback(err);
+    var allPages = info.pages;
+    for(var object in allPages){ // because allPages is a dict, need to iterate over all the object in it
+      result.push(allPages[object].title);
+    }
+ 
+   
+    if( data['query-continue'] == undefined){
+      console.log(result.length + ' template names  has been crawled'  );
+      callback(null,result);
+    }
+    else{ // if there are still query-continue, update the params and recursively call itself
+      var ctnFlag = data['query-continue'].templates.gtlcontinue;
+      params.gtlcontinue = ctnFlag;
+      getAllArticles(client, params, result, callback);
+    }
+  })
+}
 
 router.get('/im', function(req,res){
   var page = req.query.page;
@@ -34,24 +53,17 @@ router.get('/im', function(req,res){
   var templates = [];
 
   async.waterfall([
-     
+
+
     function(callback){//get all the templates used on the target page
-      var templates = [];
-      templates.push(page);
-      client.api.call(params,function(err,info,next,data){
-        if(err) callback(err);
-        var allPages = info.pages;
-        console.log(allPages);
-        for(var object in allPages){ // because allPages is a dict, need to iterate over all the object in it
-          templates.push(allPages[object].title);
-        }
-        console.log('templates : ' + templates);
-        callback(null,templates);
-      })
+      var ret = [];
+      ret.push(page);
+      getAllArticles(client,params, ret, callback);
+
     }, // end of first waterfall function
 
     function(arg, callback){ //arg1 is now all the pages including templates that needs to be crawled
-      
+      console.time('crawlPages');
       var articles = arg;
       console.log(articles.length + ' articles needs to be created');
       var workDone = 0;
@@ -62,6 +74,7 @@ router.get('/im', function(req,res){
           workDone++;
           ret.push({ARTICLE: this.name, VALUE:result});
           if(workDone == articles.length){
+            console.timeEnd('crawlPages');
             callback(null, ret);
           }
         }.bind({name: articles[i]}))
@@ -83,6 +96,7 @@ router.get('/im', function(req,res){
     }, //end of thrid waterfall function
 
     function(arg, callback){ // editor function for the source domain
+      console.time('edit');
       var editorDone = 0;
       for(var i = 0; i < arg.length; i++){
         var pageName= arg[i].ARTICLE;
@@ -91,15 +105,17 @@ router.get('/im', function(req,res){
           if(err) callback(err);
           editorDone++;
           if(editorDone == arg.length){
+            console.timeEnd('edit');
             callback(null, 'the wiki page has been sucessfully crawled');
           }
         });
       }
     } //end of the forth waterfall function
 
-  ], function(err,result){
+  ], function(err,result){ //final response function for the waterfall
     if(err){
       console.log(err);
+      return;
     }
     res.send(result);
   }
@@ -148,7 +164,7 @@ router.get('/article',function(req,res){
       	var allPages = info.pages;
       	for(var object in allPages){
           	templates.push(allPages[object].title);
-            console.log(allPages[object].title);
+      //      console.log(allPages[object].title);
       	}
       	
         var len = templates.length;
