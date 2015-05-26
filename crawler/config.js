@@ -1,5 +1,7 @@
 module.exports= {
 	secret: "HuijiGuxiGaoAng",
-	server: "test.huiji.wiki",
-	port: "1414"	
+	bot:{
+		name: "米拉西斯",
+		pwd: "fireandblood"
+	}
 };

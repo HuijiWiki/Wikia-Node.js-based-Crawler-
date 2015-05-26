@@ -21,7 +21,7 @@ router.get('/im', function(req,res){
   var client = new bot({
     server: domain,
     path: '',
-    debug: true
+    debug: false
   });
 
   var params = {
@@ -41,15 +41,19 @@ router.get('/im', function(req,res){
       client.api.call(params,function(err,info,next,data){
         if(err) callback(err);
         var allPages = info.pages;
-        for(var i = 0; i < allPages.length; i++){
-          templaes[i].push(allPages[i].title);
+        console.log(allPages);
+        for(var object in allPages){ // because allPages is a dict, need to iterate over all the object in it
+          templates.push(allPages[object].title);
         }
+        console.log('templates : ' + templates);
         callback(null,templates);
       })
     }, // end of first waterfall function
 
     function(arg, callback){ //arg1 is now all the pages including templates that needs to be crawled
+      
       var articles = arg;
+      console.log(articles.length + ' articles needs to be created');
       var workDone = 0;
       var ret = [];
       for(var i =0 ;i < articles.length;i++){
@@ -63,17 +67,18 @@ router.get('/im', function(req,res){
         }.bind({name: articles[i]}))
       }//end of for loop
       
-      }//end of second waterfall function
+      },//end of second waterfall function
 
-    function(arg, callabck){ //register the edit bot for the source domain
+
+    function(arg, callback){ //register the edit bot for the source domain
       client = new bot({
         server: source,
         path: '',
-        debug: true
-      })
+        debug: false
+      });
       client.logIn(config.bot.name, config.bot.pwd, function(err,result){
         if(err) callback(err);
-        callback(arg); // pass the result from the previous function to next editor function
+        callback(null, arg); // pass the result from the previous function to next editor function
       })
     }, //end of thrid waterfall function
 
@@ -86,11 +91,11 @@ router.get('/im', function(req,res){
           if(err) callback(err);
           editorDone++;
           if(editorDone == arg.length){
-            callback('the wiki page has been sucessfully crawled');
+            callback(null, 'the wiki page has been sucessfully crawled');
           }
         });
       }
-    }
+    } //end of the forth waterfall function
 
   ], function(err,result){
     if(err){
@@ -100,6 +105,9 @@ router.get('/im', function(req,res){
   }
   );//end of async water fall function
 });
+
+
+
 
 //the prototype of the crawler 
 //saved for future refence, needs to be cleaned after the migration
