@@ -10,7 +10,8 @@ var async = require('async');
 
 
 //a function to recursively crawl all the related templates for a specific page
-function getAllArticles(client, params, result, callback){
+
+function getAllTemplates(client, params, result, callback){
   client.api.call(params, function(err, info,next,data){
     if(err) callback(err);
     var allPages = info.pages;
@@ -26,9 +27,39 @@ function getAllArticles(client, params, result, callback){
     else{ // if there are still query-continue, update the params and recursively call itself
       var ctnFlag = data['query-continue'].templates.gtlcontinue;
       params.gtlcontinue = ctnFlag;
-      getAllArticles(client, params, result, callback);
+      
+    getAllTemplates(client, params, result, callback);
     }
   })
+}
+
+//a function to crawl all the articles with in the Mediawiki:MediaWiki:Wiki-navigation 
+
+function getAllNavArticles(client, params, ret, callback){
+  var navbarLink = 'Mediawiki:Wiki-navigation';
+  client.getArticle(navbarLink, function(err, result){
+    var nvaBarArtciles = [];
+    var re = /([*]+)([]) /(|[a-Z + 0-9]+)* /
+  });
+}
+
+
+//function to crawl the content of an articleList and store them in an array as return value 
+function crawlArticlesContent(client, articleList, callback){
+  console.time('content crawling');
+  var workDone = 0;
+  var ret = [];
+  for(var i = 0; i < articleList.length; i++){
+    client.getArticle(articleList[i], function(err, result){
+      if(err) callback(err);
+      workDone++;
+      ret.push({ARTICLE: this.name, VALUE: result});
+      if(workDone == articleList.length){
+        console.timeEnd(content crawling);
+        callback(null, ret);
+      }
+    }.bind({name: articleList[i]}));
+  }
 }
 
 router.get('/im', function(req,res){
@@ -58,7 +89,8 @@ router.get('/im', function(req,res){
     function(callback){//get all the templates used on the target page
       var ret = [];
       ret.push(page);
-      getAllArticles(client,params, ret, callback);
+      
+      getAllTemplates(client,params, ret, callback);
 
     }, // end of first waterfall function
 
