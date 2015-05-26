@@ -70,10 +70,69 @@ r.connect(config.database).then(function(c){
 //valid targer domain
 //jobType: 1. a template mediawiki website; 2. a mediawiki page
 
-function generatejobId(var usr, var target){
 
-};
 
+//the function for the async waterfall model to get all the templates pages for one article
+//An array will passed to the next function call in the form
+//[{BOT: bot}, {article: a1}, {article: a2} ... ]
+
+function getAllTemplates(url, pageName, callback){
+	var client = new bot({
+		server: url,
+		path: '',
+		debug: true,
+	});
+	var params = {
+		action:'query',
+		generator: 'templates',
+		title: pageName,
+		format: 'jason'
+	}
+
+	ret = [];
+	ret.push({BOT: client});
+	ret.push([[pageName]);
+	//get all the templates used in the page
+	client.api.call(params, function(err,info,next,data){
+		if(err) callback(err);
+		var allPages = info.pages;
+		for(var i = 0; i < allPages.length; i++){ // add the article information to the ret value
+			ret[1].push(allPages[i].title);
+		}
+		callback(null, ret);
+		return; 
+	});
+}
+
+
+//crawler function for the async waterfall model 
+function crawlTempalges(args, callback){
+	var client = args[0].BOT;
+	async.each(args[1], function(pageName, cb){
+		client.getArticle(pageName,function(err,result){
+			if(err){
+				cb('getting '+pageName + 'encounters an error');
+			}
+
+		})
+	})
+}
+
+
+function registerEditBot(url, config, callback){
+	var client = new bot({
+		server: config.host.server,
+		path: '/',
+		debug: true;
+		username: config.username,
+		password: config.pwd
+	});
+	client.logIn(config.username, config.pwd,function(err,result){
+		if(err) callback('can not register the bot to edit the wiki');
+		callback(result);
+	});
+
+}
 
 router.post('/create', function(req, res){
 	var usr = req.params.user;
@@ -86,12 +145,6 @@ router.post('/create', function(req, res){
 
 });
 
-
-router.get('/verify', function(req,res){
-	var token = req.params.token;
-	var jobId = req.params.jobId;
-	res.send('test verify');
-});
 
 
 router.get('/', function(req, res){
