@@ -2,18 +2,25 @@ var express = require('express');
 var crypto = require('crypto')
 var bot = require('nodemw');
 var config = require('../config');
+var cookies =  require('cookies');
 var router = express.Router();
-
 var async = require('async');
+var _ = require('underscore');
 
 
+
+/**
+Functions for the crawling and editing process
+****/
 
 
 //a function to recursively crawl all the related templates for a specific page
 
 function getAllTemplates(client, params, result, callback){
   client.api.call(params, function(err, info,next,data){
-    if(err) callback(err);
+    if(err || info === undefined || data === undefined) {
+    	callback('Can not get the templates');
+    }
     var allPages = info.pages;
     for(var object in allPages){ // because allPages is a dict, need to iterate over all the object in it
       result.push(allPages[object].title);
@@ -39,7 +46,8 @@ function getAllNavArticles(client, params, ret, callback){
   var navbarLink = 'Mediawiki:Wiki-navigation';
   client.getArticle(navbarLink, function(err, result){
     var nvaBarArtciles = [];
-    var re = /([*]+)([]) /(|[a-Z + 0-9]+)* /;
+    var re = /([*]+)([]) /g;
+
   });
 }
 
@@ -56,7 +64,7 @@ function crawlArticlesContent(client, articleList, callback){
       workDone++;
       ret.push({ARTICLE: this.name, VALUE: result});
       if(workDone == articleList.length){
-        console.timeEnd(content crawling);
+        console.timeEnd('content crawling');
         callback(null, ret);
       }
     }.bind({name: articleList[i]}));
@@ -70,7 +78,7 @@ function editArticleList(client, contentList, callback){
   var editDone = 0;
   for(var i = 0; i < contentList.length; i++){
   	var pageName = contentList[i].ARTICLE;
-  	var pageConten = contentList[i].VALUE;
+  	var pageContent = contentList[i].VALUE;
   	client.edit(pageName, pageContent, 'bot edit', function(err, result){
   		if(err) callback(err);
   		editDone++;
@@ -83,12 +91,61 @@ function editArticleList(client, contentList, callback){
 
 
 
+/**
+Functions to get mediawiki informaiton
+**/
+
+
+
+
+function checkUserPermission(userName, srcDomain,callback){
+  client = new bot({
+    server: srcDomain,
+    path: '',
+    debug: false
+  });
+
+  params = {
+    action: query,
+    list:  users,
+    ususers: userName,
+    usprops: groups,
+    format: jason
+  };
+
+  client.api.call(params, function(err, result){
+    if(err) callback('user not logged in on this domain');
+    var userGroups = result.query.users.groups;
+    if(userGroups === undefined){
+      callback('error in getting the user permissions');
+    }
+
+    if(_.intersection(userGroups, ['sysop', 'bots'].length == 0){
+      callback('user does not have right to make this request');
+    };
+
+    callback(null);
+  });
+};
+
 
 
 router.get('/im', function(req,res){
   var page = req.query.page;
   var domain = req.query.domain;
   var source = req.query.src 
+
+
+  var huijiCookie = config.cookieValue;
+  var cookieToken = cookie.get(hiujiCookie);
+  if(cookieToken === undefined){
+    res.send('user not logged in');
+  }
+
+  var username = huijiCookie.get('huijiUserName');
+  var userId = huijiCookie.get('huijiUserId');
+
+
 
 
   var client = new bot({
@@ -104,7 +161,6 @@ router.get('/im', function(req,res){
     format: 'jason'
   }
 
-  var templates = [];
 
   async.waterfall([
 
@@ -117,7 +173,7 @@ router.get('/im', function(req,res){
 
     }, // end of first waterfall function
 
-    function(arg, callback){ //arg1 is now all the pages including templates that needs to be crawled
+    function(arg, callback){ //arg1 is now all the pages including templates that need to be crawled
     
       var articles = arg;
       console.log(articles.length + ' articles needs to be created');
@@ -139,7 +195,7 @@ router.get('/im', function(req,res){
     }, //end of thrid waterfall function
 
     function(arg, callback){ // editor function for the source domain
-    	editArticleList(cleint, arg, callback);
+    	editArticleList(client, arg, callback);
     } //end of the forth waterfall function
 
   ], function(err,result){ //final response function for the waterfall
@@ -153,6 +209,10 @@ router.get('/im', function(req,res){
 });
 
 
+router.get('/cookie', function(req,res){
+  console.log('Cookies: ', req.cookies);
+  res.send(req.cookies['huiji_session']);
+});
 
 
 //the prototype of the crawler 
