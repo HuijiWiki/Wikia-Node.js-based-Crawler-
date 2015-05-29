@@ -39,12 +39,13 @@ function getAllNavArticles(client, params, ret, callback){
   var navbarLink = 'Mediawiki:Wiki-navigation';
   client.getArticle(navbarLink, function(err, result){
     var nvaBarArtciles = [];
-    var re = /([*]+)([]) /(|[a-Z + 0-9]+)* /
+    var re = /([*]+)([]) /(|[a-Z + 0-9]+)* /;
   });
 }
 
 
 //function to crawl the content of an articleList and store them in an array as return value 
+//should be called in the crawler waterfall function
 function crawlArticlesContent(client, articleList, callback){
   console.time('content crawling');
   var workDone = 0;
@@ -61,6 +62,28 @@ function crawlArticlesContent(client, articleList, callback){
     }.bind({name: articleList[i]}));
   }
 }
+
+
+//function to create the content page for the source domain. 
+
+function editArticleList(client, contentList, callback){
+  var editDone = 0;
+  for(var i = 0; i < contentList.length; i++){
+  	var pageName = contentList[i].ARTICLE;
+  	var pageConten = contentList[i].VALUE;
+  	client.edit(pageName, pageContent, 'bot edit', function(err, result){
+  		if(err) callback(err);
+  		editDone++;
+  		if(editDone == contentList.length){
+  			callback(null, 'SUCCESS');
+  		}
+  	});
+  }
+}
+
+
+
+
 
 router.get('/im', function(req,res){
   var page = req.query.page;
@@ -95,24 +118,12 @@ router.get('/im', function(req,res){
     }, // end of first waterfall function
 
     function(arg, callback){ //arg1 is now all the pages including templates that needs to be crawled
-      console.time('crawlPages');
+    
       var articles = arg;
       console.log(articles.length + ' articles needs to be created');
-      var workDone = 0;
-      var ret = [];
-      for(var i =0 ;i < articles.length;i++){
-        client.getArticle(articles[i],function(err,result){
-          if(err) callback(err);
-          workDone++;
-          ret.push({ARTICLE: this.name, VALUE:result});
-          if(workDone == articles.length){
-            console.timeEnd('crawlPages');
-            callback(null, ret);
-          }
-        }.bind({name: articles[i]}))
-      }//end of for loop
+      crawlArticlesContent(client, articles, callback);
       
-      },//end of second waterfall function
+    },//end of second waterfall function
 
 
     function(arg, callback){ //register the edit bot for the source domain
@@ -128,26 +139,13 @@ router.get('/im', function(req,res){
     }, //end of thrid waterfall function
 
     function(arg, callback){ // editor function for the source domain
-      console.time('edit');
-      var editorDone = 0;
-      for(var i = 0; i < arg.length; i++){
-        var pageName= arg[i].ARTICLE;
-        var content = arg[i].VALUE;
-        client.edit(pageName, content, 'bot editor', function(err, result){
-          if(err) callback(err);
-          editorDone++;
-          if(editorDone == arg.length){
-            console.timeEnd('edit');
-            callback(null, 'the wiki page has been sucessfully crawled');
-          }
-        });
-      }
+    	editArticleList(cleint, arg, callback);
     } //end of the forth waterfall function
 
   ], function(err,result){ //final response function for the waterfall
     if(err){
       console.log(err);
-      return;
+      res.send(err);
     }
     res.send(result);
   }
