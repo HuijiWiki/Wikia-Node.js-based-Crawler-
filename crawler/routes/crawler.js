@@ -40,9 +40,9 @@ function gerUserName(req, callback){
 }
 
 
-function checkUserPermission(userName, srcDomain,callback){
+function checkUserPermission(userName, toDomain,callback){
   client = new bot({
-    server: srcDomain,
+    server: toDomain,
     path: '',
     debug: false
   });
@@ -76,6 +76,68 @@ Functions for the crawling and editing process
 
 
 //a function to recursively crawl all the related templates for a specific page
+
+function crawlAndCreateArticle(articleNanme, fromDomain, toDomain, retCallback){
+
+  var client = new bot({
+    server: FromDomain,
+    path: '',
+    debug: false
+  });
+
+  var params = {
+    action: 'query',
+    generator: 'templates',
+    titles: page,
+    format: 'jason'
+  }
+
+  async.waterfall([
+    
+    function(callback){//get all the templates used on the target page
+      var ret = [];
+      ret.push(page);
+      
+      getAllTemplates(client,params, ret, callback);
+
+    }, // end of first waterfall function
+
+    function(arg, callback){ //arg1 is now all the pages including templates that need to be crawled
+    
+      var articles = arg;
+      console.log(articles.length + ' articles needs to be created');
+      crawlArticlesContent(client, articles, callback);
+      
+    },//end of second waterfall function
+
+
+    function(arg, callback){ //register the edit bot for the source domain
+      client = new bot({
+        server: toDomain,
+        path: '',
+        debug: false
+      });
+      client.logIn(config.bot.name, config.bot.pwd, function(err,result){
+        if(err) callback(err);
+        callback(null, arg); // pass the result from the previous function to next editor function
+      })
+    }, //end of thrid waterfall function
+
+    function(arg, callback){ // editor function for the source domain
+      editArticleList(client, arg, callback);
+    } //end of the forth waterfall function
+
+  ], function(err,result){ //final response function for the waterfall
+    if(err){
+      console.log(err);
+      retCallback(err);
+    }
+    retCallback(null, result);
+  }
+  );//end of async water fall function
+
+}
+
 
 function getAllTemplates(client, params, result, callback){
   client.api.call(params, function(err, info,next,data){
@@ -177,57 +239,6 @@ router.get('/im', function(req,res){
   }
 
 
-  async.waterfall([
-    
-    function(callback){
-      gerUserName(req,callback);
-    },
-
-    function(usrename, callback){
-      checkUserPermission(userName, source, callback);
-    },
-
-    function(callback){//get all the templates used on the target page
-      var ret = [];
-      ret.push(page);
-      
-      getAllTemplates(client,params, ret, callback);
-
-    }, // end of first waterfall function
-
-    function(arg, callback){ //arg1 is now all the pages including templates that need to be crawled
-    
-      var articles = arg;
-      console.log(articles.length + ' articles needs to be created');
-      crawlArticlesContent(client, articles, callback);
-      
-    },//end of second waterfall function
-
-
-    function(arg, callback){ //register the edit bot for the source domain
-      client = new bot({
-        server: source,
-        path: '',
-        debug: false
-      });
-      client.logIn(config.bot.name, config.bot.pwd, function(err,result){
-        if(err) callback(err);
-        callback(null, arg); // pass the result from the previous function to next editor function
-      })
-    }, //end of thrid waterfall function
-
-    function(arg, callback){ // editor function for the source domain
-    	editArticleList(client, arg, callback);
-    } //end of the forth waterfall function
-
-  ], function(err,result){ //final response function for the waterfall
-    if(err){
-      console.log(err);
-      res.send(err);
-    }
-    res.send(result);
-  }
-  );//end of async water fall function
 });
 
 
