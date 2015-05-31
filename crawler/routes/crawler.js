@@ -8,6 +8,67 @@ var async = require('async');
 var _ = require('underscore');
 
 
+/**
+*Validation check
+**/
+function checkSourceDomain(){
+
+}
+
+function checkTargetDomain(){}
+
+
+function gerUserName(req, callback){
+  
+  cookie = req.cookies; 
+  if(cookie == undefined){
+    callback('can not find user cookie');
+  }
+  var huijiCookie = 'huiji_session';
+  var cookieToken = cookie.get(hiujiCookie);
+  if(cookieToken === undefined){
+    res.send('user not logged in');
+  }
+
+  var username = huijiCookie.get('huijiUserName');
+  var userId = huijiCookie.get('huijiUserId');
+
+ if(username === undefined){
+    callback('user name not found');
+ }
+  callback(null, username);
+}
+
+
+function checkUserPermission(userName, srcDomain,callback){
+  client = new bot({
+    server: srcDomain,
+    path: '',
+    debug: false
+  });
+
+  params = {
+    action: query,
+    list:  users,
+    ususers: userName,
+    usprops: groups,
+    format: jason
+  };
+
+  client.api.call(params, function(err, result){
+    if(err) callback('user not logged in on this domain');
+    var userGroups = result.query.users.groups;
+    if(userGroups === undefined){
+      callback('error in getting the user permissions');
+    }
+
+    if(_.intersection(userGroups, ['sysop', 'bot','bureaucrat']).length == 0){
+      callback('user does not have right to make this request');
+    };
+
+    callback(null);
+  });
+};
 
 /**
 Functions for the crawling and editing process
@@ -91,42 +152,6 @@ function editArticleList(client, contentList, callback){
 
 
 
-/**
-Functions to get mediawiki informaiton
-**/
-
-
-
-
-function checkUserPermission(userName, srcDomain,callback){
-  client = new bot({
-    server: srcDomain,
-    path: '',
-    debug: false
-  });
-
-  params = {
-    action: query,
-    list:  users,
-    ususers: userName,
-    usprops: groups,
-    format: jason
-  };
-
-  client.api.call(params, function(err, result){
-    if(err) callback('user not logged in on this domain');
-    var userGroups = result.query.users.groups;
-    if(userGroups === undefined){
-      callback('error in getting the user permissions');
-    }
-
-    if(_.intersection(userGroups, ['sysop', 'bots'].length == 0){
-      callback('user does not have right to make this request');
-    };
-
-    callback(null);
-  });
-};
 
 
 
@@ -134,16 +159,6 @@ router.get('/im', function(req,res){
   var page = req.query.page;
   var domain = req.query.domain;
   var source = req.query.src 
-
-
-  var huijiCookie = config.cookieValue;
-  var cookieToken = cookie.get(hiujiCookie);
-  if(cookieToken === undefined){
-    res.send('user not logged in');
-  }
-
-  var username = huijiCookie.get('huijiUserName');
-  var userId = huijiCookie.get('huijiUserId');
 
 
 
@@ -163,7 +178,14 @@ router.get('/im', function(req,res){
 
 
   async.waterfall([
+    
+    function(callback){
+      gerUserName(req,callback);
+    },
 
+    function(usrename, callback){
+      checkUserPermission(userName, source, callback);
+    },
 
     function(callback){//get all the templates used on the target page
       var ret = [];
@@ -208,11 +230,6 @@ router.get('/im', function(req,res){
   );//end of async water fall function
 });
 
-
-router.get('/cookie', function(req,res){
-  console.log('Cookies: ', req.cookies);
-  res.send(req.cookies['huiji_session']);
-});
 
 
 //the prototype of the crawler 
