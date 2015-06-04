@@ -128,5 +128,6 @@ function fetchAllContentInArticle(article, mwDomain, ftCallback){
 
 module.exports = {
 	getAllTemplatesInArticle : getAllTemplatesInArticle,
-	fetchAllContentInArticle : fetchAllContentInArticle
+	fetchAllContentInArticle : fetchAllContentInArticle,
+  getArticleListContent    : getArticleListContent
 };

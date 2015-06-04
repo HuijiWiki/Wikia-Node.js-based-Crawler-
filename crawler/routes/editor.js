@@ -36,6 +36,7 @@ module.exports = {
 	* 
 	* @param {nodemw object} huijiClient, a huijibot that has been registered
 	* @param {[{ARTICLE: String, VALUE: String}]} contentList, a list of article's name and its content
+	* @param { {String : String} } pageSpec: specification for any target position change of some pages
 	* @param {String} huijiDomain: the domain where the editor will apply 
 	*/
 	editArticleListToHuiji: function(huijiClient, contentList, pageSpec, huijiDomain, callback){
@@ -45,8 +46,12 @@ module.exports = {
   			var pageContent = contentList[i].VALUE;
   			pageName = pageSpec[pageName]||pageName; //update the desired target pageName
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
-  				if(err) callback(err);
+  				if(err){
+  					callback(  error);
+  					return;
+  				}
   				editDone++;
+  				console.log('edit num :' + editDone);
   				if(editDone == contentList.length){
   					callback(null, 'SUCCESS');
   				}

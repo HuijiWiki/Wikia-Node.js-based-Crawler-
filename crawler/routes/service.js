@@ -14,6 +14,11 @@ var sm = require('./skeletonmigrator');
 
 
 /**
+* TODO: Add authentication middleware 
+*/
+
+
+/**
 * Node.js based crawler and editor service endpoint. 
 * 
 * Sample usage query: huiji.wiki:PORT/crawler?page=Test_Target_Page&fromDomain=test.wikia.com&toDomain=test.hiuji.wiki&jobType=1
@@ -60,7 +65,14 @@ router.get('/pm', function(req,res){
 
 });
 
-router.get('/sm',function(req,res){
+router.get('/smp', function(req,res){
+  sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result){
+    if(err) throw err;
+    res.send(result);
+  });
+});
+
+router.get('/smn',function(req,res){
 
   sm.getNavbarContent('templatemanager.huiji.wiki', 'Manifest:灰机基础包', function(err, result){
     if(err){

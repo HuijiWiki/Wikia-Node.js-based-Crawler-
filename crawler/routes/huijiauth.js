@@ -7,7 +7,7 @@ module.exports = {
 
 	serverValidate: function(req, vaCallback){
 		
-	}
+	},
 
 
 	/**
