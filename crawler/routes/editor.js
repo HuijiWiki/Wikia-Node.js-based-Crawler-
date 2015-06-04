@@ -41,13 +41,14 @@ module.exports = {
 	*/
 	editArticleListToHuiji: function(huijiClient, contentList, pageSpec, huijiDomain, callback){
 		var editDone = 0;
+		console.log('edit start with spec' + pageSpec);
   		for(var i = 0; i < contentList.length; i++){
   			var pageName = contentList[i].ARTICLE;
   			var pageContent = contentList[i].VALUE;
-  			pageName = pageSpec[pageName]||pageName; //update the desired target pageName
+  			pageName = pageSpec[pageName]|| pageName; //update the desired target pageName
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
   				if(err){
-  					callback(  error);
+  					callback(error);
   					return;
   				}
   				editDone++;

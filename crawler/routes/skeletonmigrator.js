@@ -14,7 +14,7 @@ module.exports = {
 	*		eg. 
 	*/
 	getPageNames: function(navbarString){
-		var re = /\n*\*+([^\*\|\n]+)(\|.*)?/g;
+		var re = /\*+\s*([^\*\|\n]+)\s*(\|.*)?/g;
 		var names = [];
 		while(ret = re.exec(navbarString)){
 
@@ -28,7 +28,7 @@ module.exports = {
 	*/
 	getPageMappingSpec: function(mappingStr){
 		var mappingList = mappingStr.split('Article Map:')[1];
-		var re = /(.+)(?:->)(.+)\n/g;
+		var re = /(\S+)\s*(?:->)\s*(\S+)\n/g;
 		var pageSpec = {};
 		while(ret = re.exec(mappingList)){
 

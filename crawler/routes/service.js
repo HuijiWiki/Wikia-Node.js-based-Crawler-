@@ -66,9 +66,10 @@ router.get('/pm', function(req,res){
 });
 
 router.get('/smp', function(req,res){
-  sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result){
+  sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result1,result2){
     if(err) throw err;
-    res.send(result);
+    console.log(result1);
+    console.log(result2);
   });
 });
 
