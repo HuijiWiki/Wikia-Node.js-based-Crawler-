@@ -4,6 +4,12 @@ var async = require('async');
 var _ = require('underscore');
 
 module.exports = {
+
+	serverValidate: function(req, vaCallback){
+		
+	}
+
+
 	/**
 	* Given a user's request, determine if he has the rights to perform some actions on a mediawiki Domain
 	* @param {Object} req, A node.js express request object
@@ -11,20 +17,24 @@ module.exports = {
 	* @param {[String]}, defined the user groups that have the rights and permission to perform action 
 	**/
 
-	validate : function(req, mwDomain, givenGroups, callback){
+	userValidate : function(req, mwDomain, givenGroups, vaCallback){
 		async.waterfall([
 			function(callback){
 				module.exports.getRequestUserName(req,callback);
 			},
 			function(userName,callback){
 				module.exports.getUserGroupsFromName(userName,mwDomain,callback);
-			}
+			},
 			function(userGroups){
 				module.exports.checkGroupRights(userGroups,givenGroups,callback);
 			}
 			], function(err, result){
-				if(err) callback(err);
-				callback(result);
+				if(err){
+					vaCallback(err);
+				}
+				else{
+					vaCallback(null, result);
+				}
 			});
 	},
 	/**
@@ -36,6 +46,7 @@ module.exports = {
 		var cookie = req.cookies;
 		if(cookie == undefined){ //if non of the request 
 			callback('Undefined Cookie');
+			return;
 		}
 		var huijiSession = 'huiji_session';
 		var huijiUserName = cookie.get(huijiSession);
@@ -64,9 +75,9 @@ module.exports = {
 
   		client.api.call(params, function(err, result){
   			if(err) callback('Can Not Get User Group');
-  			callback(null, result)
+  			else callback(null, result);
   		})
-	};
+	},
 
 	/**
 	* Validate whether the user is in the given user groups
@@ -75,12 +86,13 @@ module.exports = {
 	**/
 
 	checkGroupRights: function(userGroups, givenGroups, callback){
-		var hasRight =() _.intersection(userGroups, givenGroups).length > 0);
+		var hasRight =( _.intersection(userGroups, givenGroups).length > 0);
 		if(!hasRight){
 			callback('User Does Not Have Right For This Action');
+			return;
 		}
 		callback(null, 'Validation Success')
-	}
+	
 	}
 	 
 }
