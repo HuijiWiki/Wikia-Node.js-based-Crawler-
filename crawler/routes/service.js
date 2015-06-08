@@ -21,7 +21,7 @@ var sm = require('./skeletonmigrator');
 /**
 * Node.js based crawler and editor service endpoint. 
 * 
-* Sample usage query: huiji.wiki:PORT/crawler?page=Test_Target_Page&fromDomain=test.wikia.com&toDomain=test.hiuji.wiki&jobType=1
+* Sample usage query: huiji.wiki:PORT/pm?page=Test_Target_Page&fromDomain=test.wikia.com&toDomain=test.hiuji.wiki&jobType=1
 * 
 * Parameters Required:
 *   page: String, The target page that user wants to transfer
@@ -65,25 +65,34 @@ router.get('/pm', function(req,res){
 
 });
 
+/**
+* Node.js based skeleton crawler and eidtor service endpoint
+* 
+* Sample usage query: huiji.wiki:PORT/sm(p/n)?fromSkeletonWbsite=xxx.wikia.com&toSkeletonWebsite=test.huiji.wiki&skeleton=Mediawiki:
+* Parameter Required: 
+*   fromDomain: the domain where to copy the skeleton from
+*   targetDomain: the domain to copy the template to
+*   skeletonName: the name for the skeleton.
+*       eg. For navigation bar of a wikia website, the skeleton name will be : Mediawiki:wiki-navigation
+*           For huiji.wiki based website, the skeleton is managed under Manifesto  namespace. 
+*/
+
 router.get('/smp', function(req,res){
-  sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result1,result2){
-    if(err) throw err;
-    console.log(result1);
-    console.log(result2);
-  });
+  
+
+  try{
+    sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result){
+      if(err) throw err;
+      res.send(result);
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.send('Error Code:'+err);
+  }
 });
 
-router.get('/smn',function(req,res){
 
-  sm.getNavbarContent('templatemanager.huiji.wiki', 'Manifest:灰机基础包', function(err, result){
-    if(err){
-      res.send(err);
-    }
-    else{
-      res.send(result);
-    }
-  });
-})
 
 
 
