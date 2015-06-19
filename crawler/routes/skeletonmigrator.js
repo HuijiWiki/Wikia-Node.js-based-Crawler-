@@ -24,7 +24,7 @@ module.exports = {
 	},
 
 	/**
-	*
+	* Get the page names out of a huiji.wiki Manifesto style.
 	*/
 	getPageMappingSpec: function(mappingStr){
 		var mappingList = mappingStr.split('Article Map:')[1];
@@ -40,8 +40,9 @@ module.exports = {
 		return pageSpec;
 	},
 
+
 	/**
-	*
+	* 
 	*/
 	getNavbarContent: function(mwDomain, link, callback){
 		var client = new bot({
