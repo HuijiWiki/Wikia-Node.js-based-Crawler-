@@ -80,7 +80,7 @@ module.exports = {
 			}
 			else{
 				var strList = result.split('Articles:\n');
-			//	console.log(strList);
+				console.log(strList);
 				var pageSpec = module.exports.getPageMappingSpec(strList[0]);
 				var pages = module.exports.getPageNames(strList[1]);
 				callback(null, pages, pageSpec);

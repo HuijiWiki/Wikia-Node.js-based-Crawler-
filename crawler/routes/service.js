@@ -80,7 +80,7 @@ router.get('/pm', function(req,res){
 router.get('/smp', function(req,res){
   var fromDomain = req.fromDomain||'templatemanager.huiji.wiki';
   var targetDomain = req.targetDomain;
-  var skeletonName = req.skeletonName || req.navName;
+  var skeletonName = req.skeletonName;
   
 
   try{
