@@ -80,11 +80,11 @@ router.get('/pm', function(req,res){
 router.get('/smp', function(req,res){
   var fromDomain = req.fromDomain||'templatemanager.huiji.wiki';
   var targetDomain = req.targetDomain;
-  var skeletonName = req.skeletonname || 'Manifest:灰机基础包';
-
+  var skeletonName = req.skeletonName || req.navName;
+  
 
   try{
-    sm.installHuijiPackage('templatemanager.huiji.wiki', 'test.huiji.wiki', 'Manifest:灰机基础包',function(err, result){
+    sm.installHuijiPackage(fromDomain, targetDomain, skeletonName,function(err, result){
       if(err) throw err;
       res.send(result);
     });
