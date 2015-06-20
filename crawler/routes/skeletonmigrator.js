@@ -28,7 +28,7 @@ module.exports = {
 	*/
 	getPageMappingSpec: function(mappingStr){
 		var mappingList = mappingStr.split('Article Map:')[1];
-		var re = /(\S+)\s*(?:->)\s*(\S+)\n/g;
+		var re = /(\S+)\s*(?:->)\s*(\S+)\n+/g;
 		var pageSpec = {};
 		while(ret = re.exec(mappingList)){
 
@@ -79,6 +79,7 @@ module.exports = {
 				callback(err);
 			}
 			else{
+				console.log(result);
 				var strList = result.split('Articles:\n');
 				console.log(strList);
 				var pageSpec = module.exports.getPageMappingSpec(strList[0]);
@@ -94,6 +95,7 @@ module.exports = {
 
 	installHuijiPackage: function(huijiDomain, toDomain, link, hpCallback){
 		var pageSpecInfo = {};
+		console.log(" 1 " + huijiDomain + " 2 "+ toDomain + " 3 "+ link);
 		async.waterfall(
 			[
 				function(callback){

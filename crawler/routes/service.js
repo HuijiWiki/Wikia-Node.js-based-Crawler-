@@ -78,11 +78,12 @@ router.get('/pm', function(req,res){
 */
 
 router.get('/smp', function(req,res){
-  var fromDomain = req.fromDomain||'templatemanager.huiji.wiki';
-  var targetDomain = req.targetDomain;
-  var skeletonName = req.skeletonName;
+  var fromDomain = req.query.fromDomain||'templatemanager.huiji.wiki';
+  var targetDomain = req.query.targetDomain;
+  var skeletonName = req.query.skeletonName;
   
-
+  console.log("smp1 : " + targetDomain);
+  console.log("smp2 : " + skeletonName);
   try{
     sm.installHuijiPackage(fromDomain, targetDomain, skeletonName,function(err, result){
       if(err) throw err;

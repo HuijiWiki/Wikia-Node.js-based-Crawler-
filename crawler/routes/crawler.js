@@ -80,6 +80,8 @@ function getArticleListContent(articleList, mwDomain, callback){
 		debug: false
 	});
 
+
+
 	console.time('content crawling');
   	var workDone = 0;
   	var ret = [];
