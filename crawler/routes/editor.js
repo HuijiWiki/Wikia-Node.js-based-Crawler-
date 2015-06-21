@@ -48,7 +48,7 @@ module.exports = {
   			pageName = pageSpec[pageName]|| pageName; //update the desired target pageName
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
   				if(err){
-  					callback(error);
+  					callback(err);
   					return;
   				}
   				editDone++;
