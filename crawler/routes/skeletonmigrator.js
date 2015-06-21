@@ -132,7 +132,7 @@ module.exports = {
 				},
 				function(contentList, callback){
 					editor.huijiArticleListEditor(contentList, pageSpecInfo, toDomain, callback);
-				｝
+				}
 
 			],
 			function(err, result){

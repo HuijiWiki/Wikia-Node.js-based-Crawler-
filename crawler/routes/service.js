@@ -96,11 +96,14 @@ router.get('/smp', function(req,res){
   }
 });
 
-router.get('nvp'm function(req, res){
+router.get('/nvp', function(req, res){
   var fromDomain = req.query.fromDomain;
   var targetDomain = req.query.targetDomain;
+  console.log(fromDomain);
+    console.log(targetDomain);
+
    try{
-    sm.installWikiNav(fromDomain, targetDomain, function(err, result){
+    sm.installWikiaNav(fromDomain, targetDomain, function(err, result){
       if(err) throw err;
       res.send(result);
       });
