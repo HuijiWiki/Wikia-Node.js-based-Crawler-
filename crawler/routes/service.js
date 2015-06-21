@@ -45,7 +45,7 @@ var sm = require('./skeletonmigrator');
 *   Errors defined above if any procedure encounters an error. 
 **/
 
-router.get('/pm', function(req,res){
+router.post('/pm', function(req,res){
   var page       = req.query.page;
   var fromDomain = req.query.fromDomain;
   var toDomain   = req.query.toDomain;
@@ -77,7 +77,7 @@ router.get('/pm', function(req,res){
 *           For huiji.wiki based website, the skeleton is managed under Manifesto  namespace. 
 */
 
-router.get('/smp', function(req,res){
+router.post('/smp', function(req,res){
   var fromDomain = req.query.fromDomain||'templatemanager.huiji.wiki';
   var targetDomain = req.query.targetDomain;
   var skeletonName = req.query.skeletonName;
@@ -96,7 +96,7 @@ router.get('/smp', function(req,res){
   }
 });
 
-router.get('/nvp', function(req, res){
+router.post('/nvp', function(req, res){
   var fromDomain = req.query.fromDomain;
   var targetDomain = req.query.targetDomain;
   console.log(fromDomain);
