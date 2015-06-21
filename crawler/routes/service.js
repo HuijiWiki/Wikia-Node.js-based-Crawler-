@@ -99,19 +99,16 @@ router.post('/smp', function(req,res){
 router.post('/nvp', function(req, res){
   var fromDomain = req.query.fromDomain;
   var targetDomain = req.query.targetDomain;
-  console.log(fromDomain);
-    console.log(targetDomain);
+  res.send('please wait');
 
-   try{
-    sm.installWikiaNav(fromDomain, targetDomain, function(err, result){
-      if(err) throw err;
-      res.send(result);
-      });
+  sm.installWikiaNav(fromDomain, targetDomain,function(err, result){
+    if(err){
+      console.log(err);
     }
-   catch(err){
-    console.log(err);
-    res.send('Error Code:'+err);
+    else{
+      console.log(result);
     }
+  })
 });
 
 
