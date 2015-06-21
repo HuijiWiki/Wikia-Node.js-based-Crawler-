@@ -86,7 +86,6 @@ router.post('/smp', function(req,res){
   console.log("smp2 : " + skeletonName);
   try{
     sm.installHuijiPackage(fromDomain, targetDomain, skeletonName,function(err, result){
-      if(err) throw err;
       res.send(result);
     });
   }

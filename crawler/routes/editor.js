@@ -16,7 +16,7 @@ module.exports = {
 		var client = new bot({
 			server: huijiDomain,
 			path: '',
-			debug: false
+			debug: true
 		});
 
 		client.logIn(config.bot.name, config.bot.pwd, function(err,result){
@@ -48,8 +48,9 @@ module.exports = {
   			pageName = pageSpec[pageName]|| pageName; //update the desired target pageName
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
   				if(err){
-  					callback(err);
-  					return;
+  					//callback(err);
+  					console.log('edit error ');
+  					continue;
   				}
   				editDone++;
   				console.log('edit num :' + editDone);
