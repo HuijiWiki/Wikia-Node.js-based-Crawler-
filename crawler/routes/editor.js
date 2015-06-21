@@ -50,12 +50,11 @@ module.exports = {
   				if(err){
   					//callback(err);
   					console.log('edit error ');
-  					continue;
   				}
   				editDone++;
   				console.log('edit num :' + editDone);
   				if(editDone == contentList.length){
-  					callback(null, 'SUCCESS');
+  					callback(err, 'SUCCESS');
   				}
   			});
   		}
