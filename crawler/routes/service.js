@@ -78,6 +78,7 @@ router.post('/pm', function(req,res){
 */
 
 router.post('/smp', function(req,res){
+  console.log(req.originalUrl);
   var fromDomain = req.query.fromDomain||'templatemanager.huiji.wiki';
   var targetDomain = req.query.targetDomain;
   var skeletonName = req.query.skeletonName;
