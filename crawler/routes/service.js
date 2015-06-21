@@ -96,6 +96,21 @@ router.get('/smp', function(req,res){
   }
 });
 
+router.get('nvp'm function(req, res){
+  var fromDomain = req.query.fromDomain;
+  var targetDomain = req.query.targetDomain;
+   try{
+    sm.installWikiNav(fromDomain, targetDomain, function(err, result){
+      if(err) throw err;
+      res.send(result);
+      });
+    }
+   catch(err){
+    console.log(err);
+    res.send('Error Code:'+err);
+    }
+});
+
 
 
 

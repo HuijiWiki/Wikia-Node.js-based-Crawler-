@@ -117,6 +117,28 @@ module.exports = {
 				}
 
 			});
+	},
+
+
+	installWikiaNav: function(fromDomain, toDomain, nvCallback){
+		var pageSpecInfo = {'Mediawiki:Wiki-navigation':'Bootstrap:Subnav'};
+		async.waterfall([
+				function(callback){
+					module.exports.getNavbarContent(fromDomain, 'Mediawiki:Wiki-navigation', callback);
+				},
+				function(pageList, callback){
+					pageList.push('Mediawiki:Wiki-navigation');
+					crawler.getArticleListContent( pageList, fromDomain, callback);
+				},
+				function(contentList, callback){
+					editor.huijiArticleListEditor(contentList, pageSpecInfo, toDomain, callback);
+				｝
+
+			],
+			function(err, result){
+				nvCallback(err,result);
+			}
+			);
 	}
 
 };
