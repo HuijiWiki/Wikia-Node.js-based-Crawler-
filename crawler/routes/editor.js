@@ -16,7 +16,7 @@ module.exports = {
 		var client = new bot({
 			server: huijiDomain,
 			path: '',
-			debug: true
+			debug: false
 		});
 
 		client.logIn(config.bot.name, config.bot.pwd, function(err,result){
@@ -41,7 +41,7 @@ module.exports = {
 	*/
 	editArticleListToHuiji: function(huijiClient, contentList, pageSpec, huijiDomain, callback){
 		var editDone = 0;
-		console.log('edit start with spec' + pageSpec);
+		console.log('edit start with num ' + contentList.length);
   		for(var i = 0; i < contentList.length; i++){
   			var pageName = contentList[i].ARTICLE;
   			var pageContent = contentList[i].VALUE;
