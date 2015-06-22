@@ -41,8 +41,12 @@ function getAllTemplatesInArticle(page, mwDomain, callback){
 
 function getAllTemplatesHelper(client, params, result, callback){
   client.api.call(params, function(err, info,next,data){
-    if(err || info === undefined || data === undefined) {
-    	callback('Template Crawl Error');
+    if(err ) {
+    	callback(err);
+      return;
+    }
+    if(info === undefined || data === undefined){
+      callback(null,result);
       return;
     }
     var allPages = info.pages;

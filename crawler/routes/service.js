@@ -70,7 +70,7 @@ router.post('/mm', function(req,res){
   var fromDomain = req.query.fromDomain;
   var targetDomain   = req.query.targetDomain;
 
-  if( fromDomain == undefined || toDomain == undefined ){
+  if( fromDomain == undefined || targetDomain == undefined ){
     res.send('Parameter Undefined Error');
     return;
   }

@@ -16,7 +16,7 @@ module.exports = {
 		var client = new bot({
 			server: huijiDomain,
 			path: '',
-			debug: false
+			debug: true
 		});
 
 		client.logIn(config.bot.name, config.bot.pwd, function(err,result){
@@ -46,6 +46,8 @@ module.exports = {
   			var pageName = contentList[i].ARTICLE;
   			var pageContent = contentList[i].VALUE;
   			pageName = pageSpec[pageName]|| pageName; //update the desired target pageName
+  			console.log('debug Mapping:'  + pageSpec['Main Page'] + pageSpec);
+  			//console.log('edit ' + contentList[i].ARTICLE + ' with mapping: ' + pageName);
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
   				if(err){
   					//callback(err);

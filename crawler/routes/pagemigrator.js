@@ -12,15 +12,25 @@ module.exports = {
 			path: '',
 			debug: true
 		});
+		/**
 		client.getArticle('MediaWiki:Mainpage', function(err, result){
 			if(err){
 				callback(err);
 			}
 			else{
-				console.log(result);
+				console.log('Main Page is ' + result);
 				callback(null, result);
 			}
 
+		});
+**/
+		client.getSiteInfo('general', function(err,result){
+			if(err){
+				callback(err);
+			}
+			else{
+				callback(null, result.general.mainpage);
+			}
 		});
 	},
 
@@ -29,10 +39,13 @@ module.exports = {
 			[
 				function(callback){
 					module.exports.getMainPage(fromDomain,callback);
+					//callback('Main Page');
 				},
 
 				function(mainPage, callback){
-					module.exports.migrateSinglePage(mainPage, fromDomain, toDomain, {} , callback);
+					pageSpecInfo = {};
+					pageSpecInfo[mainPage]='首页';
+					module.exports.migrateSinglePage(mainPage, fromDomain, toDomain, pageSpecInfo, callback);
 				}
 			],
 			function(err,result){
