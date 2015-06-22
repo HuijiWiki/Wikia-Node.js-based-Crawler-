@@ -1,10 +1,50 @@
 var crawler = require('./crawler');
 var editor = require('./editor');
 var auth = require('./huijiauth');
-
+var bot  = require('nodemw');
 var async = require('async');
 
 module.exports = {
+
+	getMainPage: function(mwDomain, callback){
+		var client = new bot({
+			server: mwDomain,
+			path: '',
+			debug: true
+		});
+		client.getArticle('MediaWiki:Mainpage', function(err, result){
+			if(err){
+				callback(err);
+			}
+			else{
+				console.log(result);
+				callback(null, result);
+			}
+
+		});
+	},
+
+	migrateMainPage: function(fromDomain, toDomain, mmCallback){
+		async.waterfall(
+			[
+				function(callback){
+					module.exports.getMainPage(fromDomain,callback);
+				},
+
+				function(mainPage, callback){
+					module.exports.migrateSinglePage(mainPage, fromDomain, toDomain, {} , callback);
+				}
+			],
+			function(err,result){
+				if(err){
+					mmCallback(err);
+				}
+				else{
+					mmCallback(null, result);
+				}
+			});
+	},
+
 	migrateSinglePage: function(page, fromDomain, toDomain, pageSpec,  mpCallback){
 		async.waterfall(
 			[

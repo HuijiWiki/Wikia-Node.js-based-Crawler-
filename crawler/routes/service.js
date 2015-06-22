@@ -65,6 +65,26 @@ router.post('/pm', function(req,res){
 
 });
 
+
+router.post('/mm', function(req,res){
+  var fromDomain = req.query.fromDomain;
+  var targetDomain   = req.query.targetDomain;
+
+  if( fromDomain == undefined || toDomain == undefined ){
+    res.send('Parameter Undefined Error');
+    return;
+  }
+
+  pm.migrateMainPage(fromDomain, targetDomain, function(err, result){
+    if(err){
+      res.send(err);
+    }
+    else{
+      res.send('Main Page Migrate Sucess');
+    }
+  });
+
+});
 /**
 * Node.js based skeleton crawler and eidtor service endpoint
 * 
