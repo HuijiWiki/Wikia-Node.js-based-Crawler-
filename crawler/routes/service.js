@@ -11,6 +11,16 @@ var _ = require('underscore');
 var pm = require('./pagemigrator');
 var sm = require('./skeletonmigrator');
 
+/**
+* The authentication layer which should be called for requests for the node.js services. 
+*
+*/
+
+
+
+router.all('*', function(req,res,next){
+
+});
 
 
 /**
