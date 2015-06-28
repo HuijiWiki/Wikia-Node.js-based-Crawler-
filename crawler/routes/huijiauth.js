@@ -2,11 +2,15 @@
 var bot = require('nodemw');
 var async = require('async');
 var _ = require('underscore');
+var err = require('');
 
 module.exports = {
 
 	serverValidate: function(req, vaCallback){
-		
+		var apiToken = req.query.apiToken;
+		if(apiToken === undefined){
+			res.send(err.);
+		}
 	},
 
 

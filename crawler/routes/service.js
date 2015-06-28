@@ -10,6 +10,10 @@ var _ = require('underscore');
 
 var pm = require('./pagemigrator');
 var sm = require('./skeletonmigrator');
+var err= require('./errMessage');
+var errCheck = require('./huijiauth');
+
+
 
 /**
 * The authentication layer which should be called for requests for the node.js services. 
@@ -19,6 +23,12 @@ var sm = require('./skeletonmigrator');
 
 
 router.all('*', function(req,res,next){
+  var requestErr = errCheck.serverValidate(req);
+  if(reuestErr){
+    res.send(requestEr);
+    return;
+  }
+  next;
 
 });
 
@@ -81,11 +91,12 @@ router.post('/mm', function(req,res){
   var targetDomain   = req.query.targetDomain;
 
   if( fromDomain == undefined || targetDomain == undefined ){
-    res.send('Parameter Undefined Error');
+    res.send(err.REQUEST_ERR.missingParamError);
     return;
   }
 
-  pm.migrateMainPage(fromDomain, targetDomain, function(err, result){
+
+    pm.migrateMainPage(fromDomain, targetDomain, function(err, result){
     if(err){
       res.send(err);
     }
@@ -112,7 +123,11 @@ router.post('/smp', function(req,res){
   var fromDomain = req.query.fromDomain||'templatemanager.huiji.wiki';
   var targetDomain = req.query.targetDomain;
   var skeletonName = req.query.skeletonName;
-  
+
+  if(targetDomain === undefined || skeletonName === undefined){
+    res.send(err.REQUEST_ERR.missingParamError);
+  }
+
   console.log("smp1 : " + targetDomain);
   console.log("smp2 : " + skeletonName);
   try{

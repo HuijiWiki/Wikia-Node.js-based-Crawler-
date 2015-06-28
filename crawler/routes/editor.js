@@ -2,6 +2,7 @@ var bot = require('nodemw');
 var async = require('async');
 var config = require('../config');
 
+var err = require('./errMessage');
 module.exports = {
 
 	/** 
@@ -21,7 +22,7 @@ module.exports = {
 
 		client.logIn(config.bot.name, config.bot.pwd, function(err,result){
         	if(err){
-        		callback(err);
+        		callback(err.LOGIN_ERR.botLoginError);
         	}
         	else{
         		callback(null, client); // pass the result from the previous function to next editor function
@@ -51,17 +52,15 @@ module.exports = {
   			huijiClient.edit(pageName, pageContent, 'bot edit', function(err, result){
   				if(err){
   					//callback(err);
-  					console.log('edit error ');
+  					console.log(err.EDIT_ERR.aritcleEditorError(this.articleName));
   				}
   				editDone++;
-  				console.log('edit num :' + editDone);
   				if(editDone == contentList.length){
   					callback(err, 'SUCCESS');
   				}
-  			});
+  			}).bind({articleName: contentList[i]});
   		}
-	},
-
+    },
 	/**
 	* Register and Created/Edit the given articleList content to huiji.wiki domain
 	* 
