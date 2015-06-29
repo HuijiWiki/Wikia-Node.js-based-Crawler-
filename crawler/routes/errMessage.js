@@ -11,14 +11,20 @@ module.exports = {
 	},
 
 	CRAWL_ERR: {
+		templateError: function(articleName){
+			return "error: can not get template " + articleName + " from original domain";
+		},
 
+		crawlError: function(articleName){
+			return "error: can not get crawl " + articleName + " from original domain";
+		}
 	},
 
 	REQUEST_ERR:{
 		missingParamError: 'error: key parameters are missing',
 		validationError  : 'error: api secret missing for the request',
-		tooLongError     : 'error: the request parameter is too long',
+		tooLongError     : 'error: the request parameter is too long'
 
 	}
 
-}
+};
