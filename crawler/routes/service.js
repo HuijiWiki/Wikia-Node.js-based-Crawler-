@@ -6,14 +6,19 @@ var cookies =  require('cookies');
 var router = express.Router();
 var async = require('async');
 var _ = require('underscore');
+var body
+
+//import packages
+var pm = require('../packages/pagemigrator');
+var sm = require('../packages/skeletonmigrator');
+var err= require('../packages/errMessage');
+var errCheck = require('../packages/huijiauth');
 
 
-var pm = require('./pagemigrator');
-var sm = require('./skeletonmigrator');
-var err= require('./errMessage');
-var errCheck = require('./huijiauth');
 
-
+/**
+ * TODO: Add authentication middleware
+ */
 
 /**
 * The authentication layer which should be called for requests for the node.js services. 
@@ -33,9 +38,6 @@ router.all('*', function(req,res,next){
 });
 
 
-/**
-* TODO: Add authentication middleware 
-*/
 
 
 /**
@@ -141,6 +143,9 @@ router.post('/smp', function(req,res){
   }
 });
 
+/* Node.js skeleton migartor (depreciated)
+ * Move a wikia based navbar content to huiji.wiki
+ */
 router.post('/nvp', function(req, res){
   var fromDomain = req.query.fromDomain;
   var targetDomain = req.query.targetDomain;

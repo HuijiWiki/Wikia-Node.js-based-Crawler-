@@ -1,6 +1,6 @@
 var bot = require('nodemw');
 var async = require('async');
-var err = require('./errMessage');
+
 
 /**
 * Get all all the templates used in the target page. 
@@ -10,8 +10,7 @@ var err = require('./errMessage');
 * template name info
 * 
 * @param {String} page, the target page name 
-* @param {String} mwDomain, the mediawiki domain API url where the target page is in*
- * @param {func} callback,
+* @param {String} mwDomain, the mediawiki domain API url where the target page is in
 *
 **/
 
@@ -27,7 +26,7 @@ function getAllTemplatesInArticle(page, mwDomain, callback){
     generator: 'templates',
     titles: page,
     format: 'jason'
-  };
+  }
 
   result = [];
 
@@ -42,8 +41,12 @@ function getAllTemplatesInArticle(page, mwDomain, callback){
 
 function getAllTemplatesHelper(client, params, result, callback){
   client.api.call(params, function(err, info,next,data){
-    if(err || info === undefined || data === undefined) {
-    	callback(err.CRAWL_ERR.templateError(params.titles));
+    if(err ) {
+    	callback(err);
+      return;
+    }
+    if(info === undefined || data === undefined){
+      callback(null,result);
       return;
     }
     var allPages = info.pages;
@@ -57,7 +60,8 @@ function getAllTemplatesHelper(client, params, result, callback){
       callback(null,result);
     }
     else{ // if there are still query-continue, update the params and call myself recursively
-      params.gtlcontinue = data['query-continue'].templates.gtlcontinue;
+      var ctnFlag = data['query-continue'].templates.gtlcontinue;
+      params.gtlcontinue = ctnFlag;
       
     getAllTemplatesHelper(client, params, result, callback);
     }
@@ -79,6 +83,8 @@ function getArticleListContent(articleList, mwDomain, callback){
 		path : '',
 		debug: false
 	});
+
+
 
 	console.time('content crawling');
   	var workDone = 0;
@@ -121,7 +127,7 @@ function fetchAllContentInArticle(article, mwDomain, ftCallback){
       }
 		});
 
-}
+};
 
 
 module.exports = {

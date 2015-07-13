@@ -24,11 +24,11 @@ module.exports = {
 	},
 
 	/**
-	*
+	* Get the page names out of a huiji.wiki Manifesto style.
 	*/
 	getPageMappingSpec: function(mappingStr){
 		var mappingList = mappingStr.split('Article Map:')[1];
-		var re = /(\S+)\s*(?:->)\s*(\S+)\n/g;
+		var re = /(\S+)\s*(?:->)\s*(\S+)\n+/g;
 		var pageSpec = {};
 		while(ret = re.exec(mappingList)){
 
@@ -40,8 +40,9 @@ module.exports = {
 		return pageSpec;
 	},
 
+
 	/**
-	*
+	* 
 	*/
 	getNavbarContent: function(mwDomain, link, callback){
 		var client = new bot({
@@ -78,8 +79,9 @@ module.exports = {
 				callback(err);
 			}
 			else{
+				console.log(result);
 				var strList = result.split('Articles:\n');
-			//	console.log(strList);
+				console.log(strList);
 				var pageSpec = module.exports.getPageMappingSpec(strList[0]);
 				var pages = module.exports.getPageNames(strList[1]);
 				callback(null, pages, pageSpec);
@@ -93,6 +95,7 @@ module.exports = {
 
 	installHuijiPackage: function(huijiDomain, toDomain, link, hpCallback){
 		var pageSpecInfo = {};
+		console.log(" 1 " + huijiDomain + " 2 "+ toDomain + " 3 "+ link);
 		async.waterfall(
 			[
 				function(callback){
@@ -114,6 +117,28 @@ module.exports = {
 				}
 
 			});
+	},
+
+
+	installWikiaNav: function(fromDomain, toDomain, nvCallback){
+		var pageSpecInfo = {'Mediawiki:Wiki-navigation':'Bootstrap:Subnav'};
+		async.waterfall([
+				function(callback){
+					module.exports.getNavbarContent(fromDomain, 'Mediawiki:Wiki-navigation', callback);
+				},
+				function(pageList, callback){
+					pageList.push('Mediawiki:Wiki-navigation');
+					crawler.getArticleListContent( pageList, fromDomain, callback);
+				},
+				function(contentList, callback){
+					editor.huijiArticleListEditor(contentList, pageSpecInfo, toDomain, callback);
+				}
+
+			],
+			function(err, result){
+				nvCallback(err,result);
+			}
+			);
 	}
 
 };

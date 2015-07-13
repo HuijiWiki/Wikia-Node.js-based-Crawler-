@@ -2,70 +2,25 @@
 var bot = require('nodemw');
 var async = require('async');
 var _ = require('underscore');
-var err = require('./errMessage');
 var config = require('../config');
+var err = require('./errMessage');
+
 module.exports = {
 
-
-
-
-	encodedURLparamValidateErr: function(param){
-		if(param.length > 100){
-			return err.REQUEST_ERR.tooLongError;
-		}
-
-
-        //TODO: escape speicial characters for the request
-
-
-		var re = /[\&\(\)]+/g; //the regular expression to catch speicial characters in the param
-
-	},
-
-	/**
-	 *
-	 * @param req A request for the service
-	 * @returns {String} error message defined in errMessage.js if there is any error in the process. null if sucesss
-	 */
-
-	serverValidateErr: function(req){
+	serverValidate: function(req, vaCallback){
 		var apiToken = req.query.apiToken;
-		if(apiToken === undefined){
-			res.send(err.REQUEST_ERR.missingParamError);
-		}
-		if(apiToken === config.apiSecret){
-			return null;
-		}
-		else{
+		if(apiToken === undefined || apiToken != config.apiSecret){
 			return err.REQUEST_ERR.validationError;
 		}
-	},
-
-
-	/** validate if the params for skeletonMigrator are missing or not.
-	 *
-	 * @param req
-	 * @returns {*}
-	 */
-
-	huijiSkeletonValidateErr: function(req){
-		var paramList = [];
-		var fromDomain = req.query.fromDomain || "templatemanager.huiji.wiki";
-		var targetDomain = req.query.targetDomain;
-		var skeletonName = req.query.skeletonName;
-
-		if(targetDomain === undefined || skeletonName === undefined){
-			return err.REQUEST_ERR.missingParamError;
-		}
-
 		return null;
 	},
+
 
 	/**
 	* Given a user's request, determine if he has the rights to perform some actions on a mediawiki Domain
 	* @param {Object} req, A node.js express request object
 	* @param {String} mwDomain, the mediawiki Domain that user wants to perform action on
-	* @param {[String]}, defined the user groups that have the rights and permission to perform action 
+	* @param {[String]} givenGroups, defined the user groups that have the rights and permission to perform action
 	**/
 
 	userValidate : function(req, mwDomain, givenGroups, vaCallback){
@@ -90,7 +45,7 @@ module.exports = {
 	},
 	/**
 	* Get the user's information from request cookies
-	* @param {String} request: the request object
+	* @param {String} req the request object
 	* @callback {String} Error if not valid user cookie
 	*/
 	getRequestUserName: function(req, callback){
